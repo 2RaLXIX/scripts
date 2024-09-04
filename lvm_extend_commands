@@ -1,0 +1,9 @@
+echo "- - -" > /sys/class/scsi_host/host0/scan 
+vgs
+pvdisplay
+mkfs.ext4 /dev/sd*
+pvcreate /dev/sd*
+vgextend *vm_name /dev/sd*
+lvextend -l +100%FREE /dev/*vg_name/*lv_name
+resize2fs /dev/*vg_name/*lv_name ---- For ext3 and ext4 file system
+xfs_growfs /*mount/*point ---- For xfs file system
