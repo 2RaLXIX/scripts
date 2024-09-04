@@ -1,0 +1,2 @@
+for file in *; do mv "$file" "Basic_script_$file"; done && ls -l =========== To rename
+for file in *; do mv "$file" "${file#Basic_script_"; done && ls -l ========= To roll back
