@@ -1,0 +1,1 @@
+mysqldump -u db-team -p --all-databases --ignore-table=mysql.innodb_index_stats --ignore-table=mysql.innodb_table_stats > dbnew.sql
