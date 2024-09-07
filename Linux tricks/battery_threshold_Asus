@@ -1,0 +1,84 @@
+1. Create in /usr/local/bin/battery_threshold.sh
+2. #!/bin/bash
+   sudo echo 80 | sudo tee /sys/class/power_supply/BAT0/charge_control_end_threshold
+3. chmod +x battery_threshold.sh
+4. Create in /etc/systemd/system/battery-threshold.service
+   [Unit]
+Description=Overwrite battery config
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/battery_threshold.sh
+
+[Install]
+WantedBy=multi-user.target
+
+3. chmod +x battery_threshold.sh
+4. Create in /etc/systemd/system/battery-threshold.service
+   [Unit]
+Description=Overwrite battery config
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/battery_threshold.sh
+
+[Install]
+WantedBy=multi-user.target
+
+3. chmod +x battery_threshold.sh
+4. Create in /etc/systemd/system/battery-threshold.service
+   [Unit]
+Description=Overwrite battery config
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/battery_threshold.sh
+
+[Install]
+WantedBy=multi-user.target
+
+3. chmod +x battery_threshold.sh
+4. Create in /etc/systemd/system/battery-threshold.service
+   [Unit]
+Description=Overwrite battery config
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/battery_threshold.sh
+
+[Install]
+WantedBy=multi-user.target
+
+3. chmod +x battery_threshold.sh
+4. Create in /etc/systemd/system/battery-threshold.service
+   [Unit]
+Description=Overwrite battery config
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/battery_threshold.sh
+
+[Install]
+WantedBy=multi-user.target
+
+3. chmod +x battery_threshold.sh
+4. Create in /etc/systemd/system/battery-threshold.service
+   [Unit]
+ Description=Overwrite battery config
+After=network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/battery_threshold.sh
+
+[Install]
+WantedBy=multi-user.target
+5. sudo systemctl daemon-reload
+6. sudo systemctl enable battery-threshold.service
+7. restart
+
