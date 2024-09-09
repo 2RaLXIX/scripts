@@ -1,9 +1,7 @@
 #! /bin/bash
 
-echo "Enter first number:"
-read x
-echo "Enter second number:"
-read y
+read -p "Enter first number:" x
+read -p "Enter second number:" y
 
 if [ $x -gt $y ]
 	then
