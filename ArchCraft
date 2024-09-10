@@ -1,0 +1,6 @@
+ArchCraft update error fix:
+
+pacman -Qikk archlinux-keyring
+sudo pacman -Sy archlinux-keyring
+pacman-key -l alerque@archlinux.org
+sudo pacman -Syu
