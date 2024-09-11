@@ -1,0 +1,38 @@
+#!/bin/bash
+
+subnet="172.16.81"
+
+output_file="empty_ips.txt"
+busy="busy_ips.txt"
+
+truncate -s 0 $output_file
+truncate -s 0 $busy
+
+handle_interrupt() {
+	echo "Script interrupted. Exiting..."
+	exit 1
+}
+trap handle_interrupt SIGINT
+
+for i in {1..254}; do
+
+	ip="$subnet.$i"
+	ping -c 3 -W 3 $ip > /dev/null 2>&1
+	ping_status=$?
+
+	if [ $ping_status -ne 0 ]; then
+		nmap -Pn $ip > /dev/null 2>&1
+		nmap_status=$?
+
+		if [ $nmap_status -ne 0 ]; then
+			echo "IP $ip is free." 
+			echo "IP $ip is free." >> $output_file 
+		else
+			echo "IP $ip is in use (detected by nmap)."
+			echo "IP $ip is in use (detected by nmap)." >> $busy
+		fi
+	else
+		echo "IP $ip is in use (detected by ping)."
+		echo "IP $ip is in use (detected by ping)." >> $busy
+	fi
+done
