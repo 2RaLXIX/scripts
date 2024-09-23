@@ -4,7 +4,7 @@ read -p "Enter application to search in system tray: " app
 tray=$(ps -ef)
 echo "$tray" > tray.txt
 awk=$(awk '{print $8}' tray.txt)
-echo "$awk" > tray.txt 
+echo "$awk" >> tray.txt 
 file=tray.txt
 
 if [ -f "$file" ]; then
