@@ -12,6 +12,6 @@ echo "epel-release installed. Pausing for package update..."
 sudo yum update -y
 
 echo "Installing programs..."
-sudo yum install vim net-tools bat wget htop tree neofetch tar zip bash-completion NetworkManager-initscripts-updown -y
+sudo yum install vim net-tools tldr bat wget htop tree neofetch tar zip bash-completion NetworkManager-initscripts-updown -y
 
 echo "All specified packages installed successfully."
