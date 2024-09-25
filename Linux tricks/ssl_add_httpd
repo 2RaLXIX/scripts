@@ -1,0 +1,43 @@
+#HTTP Configuration
+<VirtualHost *:80>
+ServerAdmin webmaster@ipam.goldenpay.az
+ServerName ipam.goldenpay.az
+ServerAlias www.ipam.goldenpay.az
+
+DocumentRoot /var/www/html/phpipam
+<Directory /vat/www/html/phpipam>
+	Options Indexes FollowSymLinks
+	AllowOverride All
+	Require all granted
+</Directory>
+
+RewriteEngine On
+RewriteCond ${HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+ErrorLog /var/log/httpd/ipam.log
+CustomLog /var/log/httpd/ipam.log combined
+</VirtualHost>
+
+#HTTPS Configuration
+<VirtualHost *:443>
+ServerAdmin webmaster@ipam.goldenpay.az
+ServerName ipam.goldenpay.az:443
+ServerAlias www.ipam.goldenpay.az
+
+DocumentRoot "/var/www/html/phpipam"
+<Directory /var/www/html/phpipam>
+	Options Indexes FollowSymLinks
+	AllowOverride All
+	Require all granted
+</Directory>
+
+
+SSLEngine on
+SSLCertificateFile /etc/httpd/ssl/goldenpay.az-wildcard.cer
+SSLCertificateKeyFile /etc/httpd/ssl/goldenpay.az_private_key.key
+
+ErrorLog /var/log/httpd/ipam.log
+CustomLog /var/log/httpd/ipam.log combined
+</VirtualHost>
+
