@@ -1,0 +1,8 @@
+1. Install python
+2. Install python-pipx
+3. Run pipx ensurepath
+4. Run sudo pipx ensurepath --global # optional to allow pipx actions with --global argument
+5. Run pipx install --python 3.11 elia-chat
+6. Export in rc file Chat GPT API key
+7. Enjoy
+
