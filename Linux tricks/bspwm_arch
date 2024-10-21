@@ -1,0 +1,19 @@
+1. sudo pacman -S bspwm sxhkd polybar picom dmenu dunst nitrogen
+2. cd $HOME/.config, mkdir bspwm sxhkd polybar picom dunst
+3. cp /usr/share/doc/bspwm/examples/bspwmrc ~/.config/bspwm
+4. cp /usr/share/doc/bspwm/examples/sxhkd ~/.config/sxkdrc
+5. cp /etc/xdg/picom.conf ~/.config/picom
+6. cp /etc/polybar/config.ini ~/.config/polybar
+7. cp /etc/dunst/dunstrc ~/.config/dunst
+8. cd ~/.config/bspwm && chmod +x bspwmrc
+9. vim bspwmrc, delete rule lines
+10. Specify autostart applications in bspwmrc file
+    sxhkd &
+    picom --config $HOME/.config/picom/picom/conf &
+    nitrogen --restore &
+    dunst &
+    polybar &
+11. cd ~/.config/sxhkd ---- Here locates file with default keybindings for bspwm
+12. Logout and Login to bspwm env
+13. Edit ~/.config/polybar file, if you need to.
+14. Enjoy =) 
