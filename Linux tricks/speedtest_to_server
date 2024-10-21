@@ -1,1 +1,2 @@
  yes | pv | ssh user@IP "cat > /dev/null"
+ ssh -X $user@$IP $app ---- Use this command to forward x11 app true the ssh
