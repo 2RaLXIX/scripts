@@ -1,0 +1,10 @@
+1. yum in lvm2
+2. lsblk
+3. sudo pvcreate /dev/sd*
+4. sudo vgcreate *myvg /dev/sd*
+5. sudo lvextend -l +100%FREE /dev/*vg-name/*lv-name
+6. sudo mkfs.ext4 /dev/*myvg/*mylv
+7. sudo mkdir /mnt/*mylv
+8. sudo mount /dev/*myvg/*mylv /mnt/*mylv
+9. echo "/dev/*myvg/*mylv	/mnt/*mylv	ext4	defaults	0	0" >> /etc/fstab
+10. Verify with: sudo pvs, sudo vgs, sudo lvs
