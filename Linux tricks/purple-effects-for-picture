@@ -1,0 +1,1 @@
+convert $input -fill 'rgba(128,0,128,0.5)' -colorize 25% $output
