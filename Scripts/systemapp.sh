@@ -28,4 +28,3 @@ else
 	echo "File '$file' doesn't exist."
 	exit 1
 fi
-
