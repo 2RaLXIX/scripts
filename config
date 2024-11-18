@@ -1,0 +1,74 @@
+Host vaultwarden
+	HostName 172.16.81.103
+	User goldenadmin
+Host hesabaz-test
+	HostName 172.20.10.211
+	User goldenadmin
+Host rocky
+	Hostname localhost
+	User thb
+	Port 2222
+#Host rocky-test1
+	#Hostname localhost
+	#User thb
+	#Port 2223
+#Host rocky-test2
+	#Hostname localhost
+	#User thb
+	#Port 2224
+Host jira-srv
+	Hostname 172.16.81.100
+	User goldenadmin
+Host newkube-master121
+	Hostname 172.16.81.121
+	User goldenadmin
+Host syslog104
+	Hostname 172.16.81.104
+	User goldenadmin
+Host server-92
+	Hostname 172.16.81.92
+	HostKeyAlgorithms +ssh-rsa
+	User goldenadmin
+Host soap-90
+	Hostname 172.16.81.90
+	HostKeyAlgorithms +ssh-rsa
+	User goldenadmin
+Host gitlab
+	HOstname 172.16.81.200
+	User goldenadmin
+Host ipam
+	Hostname 172.20.10.213
+	User goldenadmin
+Host main-dns
+	Hostname 172.16.81.210
+	User root
+Host postgresql
+	Hostname 172.16.81.115
+	User goldenadmin
+Host postgresql-slave1
+	Hostname 172.16.81.131
+	User goldenadmin
+Host postgresql-slave2
+	Hostname 172.16.81.132
+	User goldenadmin
+Host wallet-psql
+	Hostname 172.16.81.113
+	User goldenadmin
+Host task-main-dns
+	Hostname 192.168.122.174
+	User root
+Host task-slave-dns
+	Hostname 192.168.122.107
+	User root
+Host task-client-dns
+	Hostname 192.168.122.147
+	User root
+Host wallet-slave1
+	Hostname 172.16.81.116
+	User goldenadmin
+Host wallet-slave2
+	Hostname 172.16.81.117
+	User goldenadmin
+Host wallet-psql-test
+	Hostname 172.16.81.119
+	User goldenadmin
