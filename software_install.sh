@@ -1,7 +1,6 @@
 #!/bin/bash
 
-read -p "Before installing all programms, please enter hostname for this vm: " hostname
-sudo echo "$hostname" >> /etc/hostname
+read -p "Press any key to continue"
 
 echo "Updating the repositories"
 sudo yum update -y
@@ -10,7 +9,7 @@ echo "installing epel-release..."
 sudo yum install epel-release -y > /dev/null 2>&1
 
 echo "epel-release installed. Pausing for package update..."
-sudo yum update -y
+sudo yum update -y > /dev/null 2>&1
 
 echo "Installing programs..."
 sudo yum install vim net-tools tldr bat wget htop tree neofetch tar zip bash-completion NetworkManager-initscripts-updown -y
