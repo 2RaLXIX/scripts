@@ -1,6 +1,6 @@
 #!/bin/bash
 
-read -p "Please enter hostname for this vm and continue to install programms." hostname
+read -p "Before installing all programms, please enter hostname for this vm: " hostname
 sudo echo "$hostname" >> /etc/hostname
 
 echo "Updating the repositories"
