@@ -1,0 +1,5 @@
+wget --no-verbose -O - https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -v
+
+AdGuard Home is now installed and running
+you can control the service status with the following commands:
+sudo /opt/AdGuardHome/AdGuardHome -s start|stop|restart|status|install|uninstall
