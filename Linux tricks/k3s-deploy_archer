@@ -1,0 +1,119 @@
+Deploying Rancher Server with K3s on a Red Hat Enterprise Linux (RHEL)-based distribution, such as Rocky Linux, AlmaLinux, or CentOS Stream, involves several steps. Here's a detailed guide to help you with this deployment:
+
+### Prerequisites
+
+1. **RHEL-based Server**: Ensure you have a server running a RHEL-based distribution. This could be a virtual machine, a cloud instance, or a physical server.
+
+2. **Root Access**: You will need root or sudo access to install and configure the necessary software.
+
+3. **Network Configuration**: Ensure that your network settings allow the necessary ports for K3s and Rancher. Typically, ports 6443 (K3s API), 80, and 443 (Rancher UI) should be open.
+
+### Step 1: Prepare the System
+
+1. **Update System Packages**:
+   ```bash
+   sudo dnf update -y
+   ```
+
+2. **Install Required Packages**:
+   K3s requires certain dependencies. Make sure they are installed:
+   ```bash
+   sudo dnf install -y curl
+   ```
+
+3. **Disable SELinux** (optional, but can simplify the setup):
+   ```bash
+   sudo setenforce 0
+   sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
+   ```
+
+4. **Ensure iptables Legacy Mode**:
+   K3s requires iptables to be in legacy mode:
+   ```bash
+   sudo dnf install -y iptables-services
+   sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+   sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+   ```
+
+### Step 2: Install K3s
+
+1. **Install K3s**:
+   Use the official installation script to install K3s:
+   ```bash
+   curl -sfL https://get.k3s.io | sh -
+   ```
+
+2. **Verify Installation**:
+   Check that K3s is running:
+   ```bash
+   sudo systemctl status k3s
+   ```
+
+3. **Configure kubectl**:
+   Set up `kubectl` to interact with the K3s cluster:
+   ```bash
+   export KUBECONFIG=/etc/rancher/k3s/k3s.yaml
+   ```
+
+4. **Test kubectl**:
+   Ensure you can access the cluster:
+   ```bash
+   kubectl get nodes
+   ```
+
+### Step 3: Deploy Rancher
+
+1. **Install Helm**:
+   Helm is a package manager for Kubernetes and is required to deploy Rancher.
+   ```bash
+   curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+   ```
+
+2. **Create a Namespace for Rancher**:
+   ```bash
+   kubectl create namespace cattle-system
+   ```
+
+3. **Install Cert-Manager**:
+   Cert-manager is required for managing SSL certificates for Rancher.
+   ```bash
+   kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.11.0/cert-manager.yaml
+   ```
+
+4. **Verify Cert-Manager Installation**:
+   Ensure all cert-manager pods are running:
+   ```bash
+   kubectl get pods --namespace cert-manager
+   ```
+
+5. **Add the Rancher Helm Repository**:
+   ```bash
+   helm repo add rancher-stable https://releases.rancher.com/server-charts/stable
+   helm repo update
+   ```
+
+6. **Install Rancher**:
+   Use Helm to deploy Rancher:
+   ```bash
+   helm install rancher rancher-stable/rancher \
+     --namespace cattle-system \
+     --set hostname=<your-rancher-domain>
+   ```
+
+   Replace `<your-rancher-domain>` with the domain name you plan to use for accessing Rancher. You should have DNS set up to point this domain to your server's IP.
+
+7. **Check Rancher Deployment**:
+   Monitor the Rancher pods until they are fully deployed:
+   ```bash
+   kubectl -n cattle-system rollout status deploy/rancher
+   ```
+
+8. **Access Rancher**:
+   Once the deployment is complete, you can access Rancher via HTTPS at `https://<your-rancher-domain>`. Rancher will guide you through the initial setup process.
+
+### Post-Installation
+
+- **Firewall Configuration**: Ensure your firewall settings allow the necessary traffic for Rancher and K3s.
+- **Regular Backups**: Implement a backup strategy for your K3s and Rancher configurations.
+
+This guide outlines the process for setting up a single-node K3s cluster with Rancher. For production environments, you should consider setting up a high-availability (HA) configuration for both K3s and Rancher, which involves multiple nodes and more complex network and storage configurations.
