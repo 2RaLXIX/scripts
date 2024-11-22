@@ -1,9 +1,9 @@
 #!/bin/bash
 
-counter=1
+count=1
 
-while [ $counter -le 5 ];
+while [ $count -le 5 ];
 	do
-	echo $counter
-	((counter++))
+	echo $count
+	((count++))
 done
