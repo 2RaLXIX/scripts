@@ -7,4 +7,3 @@ while [ $counter -le 5 ];
 	echo $counter
 	((counter++))
 done
-
