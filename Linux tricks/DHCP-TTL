@@ -1,0 +1,7 @@
+Enable DNS Cleanup in DHCP Configuration: In the DHCP configuration (/etc/dhcp/dhcpd.conf), ensure that the server is configured to update both forward and reverse DNS zones and to delete those records when leases expire.
+
+ddns-update-style interim;
+update-static-leases on;
+
+This option ensures that the DHCP server attempts to remove DNS records when leases are released or expired.
+
