@@ -1,4 +1,4 @@
-#/bin/bash
+#!/bin/bash
 
 read -p "Enter application to search in system tray: " app
 tray=$(ps -ef)
