@@ -2,6 +2,10 @@
 
 read -p "Press any key to continue"
 
+read -p "Enter hostname you want to give to this host: " name
+
+sudo echo $name > /etc/hostname
+
 echo "Updating the repositories"
 sudo yum update -y
 
