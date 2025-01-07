@@ -1,0 +1,4 @@
+1. Add IP addresses to /etc/hosts file on all cluster vms
+2. swapoff -a, also from /etc/fstab
+3. sudo dnf install -y dnf-utils, ehtn add docker repo "sudo dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo"
+5. Install container.io, "sudo yum in container.io"
