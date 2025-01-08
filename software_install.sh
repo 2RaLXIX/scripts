@@ -20,5 +20,9 @@ sudo yum install vim net-tools tldr bat wget htop tree neofetch tar zip open-vm-
 
 echo "All specified packages installed successfully."
 
+# Use sed to uncomment the %wheel line in a safe way
+sudo cp /etc/sudoers /etc/sudoers.bak
+sudo sed -i 's/^#\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD: ALL\)/\1/' /etc/sudoers
+
 read -p "Press any key to reboot"
 sudo reboot now
