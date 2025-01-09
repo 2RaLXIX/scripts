@@ -21,6 +21,18 @@ sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 sudo swapoff -a
 sudo sed -i '/swap/d' /etc/fstab
 
+# Add firewall ports
+sudo firewall-cmd --permanent --add-port=6443/tcp
+sudo firewall-cmd --permanent --add-port=2379-2380/tcp
+sudo firewall-cmd --permanent --add-port=10250/tcp
+sudo firewall-cmd --permanent --add-port=10251/tcp
+sudo firewall-cmd --permanent --add-port=10259/tcp
+sudo firewall-cmd --permanent --add-port=10257/tcp
+sudo firewall-cmd --permanent --add-port=179/tcp
+sudo firewall-cmd --permanent --add-port=4789/udp
+
+sudo firewall-cmd --reload
+
 # Enable br_netfilter module
 sudo modprobe br_netfilter
 echo '1' | sudo tee /proc/sys/net/bridge/bridge-nf-call-iptables
@@ -65,12 +77,11 @@ echo "KUBECONFIG=/etc/kubernetes/admin.conf" >> ~/.bashrc
 source ~/.bashrc
 
 #sudo kubeadm init --pod-network-cidr=192.168.124.0/24
-
 sudo kubeadm init --control-plane-endpoint=k8s-master
 
 # Set up kubeconfig for a non-root user (uncomment and replace "yourusername" with your actual username)
 mkdir -p $HOME/.kube
-sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 # Install a Pod network add-on (Calico for this example)
@@ -78,4 +89,3 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
 
 echo "Kubernetes master node setup is complete."
-                                                                                   76,1          Bot
