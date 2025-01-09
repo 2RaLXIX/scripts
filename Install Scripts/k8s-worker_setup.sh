@@ -73,7 +73,9 @@ gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
 EOF
 
 # Install Kubernetes packages
-sudo yum install -y kubelet kubeadm kubectl
+#sudo yum install -y kubelet kubeadm kubectl
+
+sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 
 # Enable and start kubelet
 sudo systemctl enable --now kubelet
