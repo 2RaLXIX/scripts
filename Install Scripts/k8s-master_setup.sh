@@ -34,15 +34,16 @@ sudo firewall-cmd --permanent --add-port=4789/udp
 sudo firewall-cmd --reload
 
 # Enable br_netfilter module
-sudo modprobe br_netfilter
-echo '1' | sudo tee /proc/sys/net/bridge/bridge-nf-call-iptables
+#sudo modprobe br_netfilter
+#echo '1' | sudo tee /proc/sys/net/bridge/bridge-nf-call-iptables
 
-# Install Docker
-sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-sudo yum install containerd.io -y
-sudo yum install docker-ce docker-ce-sli -y
+sudo tee /etc/modules-load.d/containerd.conf <<EOF
+overlay
+br_netﬁlter
+EOF
 
-sudo systemctl enable --now docker.service
+sudo modprobe overlay
+sudo modprobe br_netﬁlter
 
 # Start and enable Docker
 sudo systemctl enable --now containerd.service
@@ -54,6 +55,21 @@ net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 
 sudo sysctl --system
+
+# Install Docker
+sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install containerd.io -y
+#sudo yum install docker-ce docker-ce-sli -y
+
+#sudo systemctl enable --now docker.service
+
+containerd conﬁg default | sudo tee /etc/containerd/conﬁg.toml >/dev/null 2>&1
+
+sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/conﬁg.toml
+
+# Start and enable Docker
+sudo systemctl enable containerd.service
+sudo systemctl restart containerd.service
 
 # Add Kubernetes repository
 sudo cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
@@ -72,9 +88,6 @@ sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 # Enable and start kubelet
 sudo systemctl enable --now kubelet
 
-# Enable and start kubelet
-sudo systemctl enable --now kubelet
-
 # Set up kubeconfig for the root user
 echo "KUBECONFIG=/etc/kubernetes/admin.conf" >> ~/.bashrc
 source ~/.bashrc
@@ -89,6 +102,7 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
 # Install a Pod network add-on (Calico for this example)
 
-kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+#kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/calico.yaml
 
 echo "Kubernetes master node setup is complete."

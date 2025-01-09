@@ -7,11 +7,12 @@ read -p "Enter hostname you want to give to this host: " name
 #sudo echo $name > /etc/hostname
 sudo bash -c "echo $name > /etc/hostname"
 
+sudo usermod -aG wheel $(whoami)
 echo "Updating the repositories"
 sudo yum update -y
 
 echo "installing epel-release..."
-sudo yum install epel-release -y > /dev/null 2>&1
+sudo yum install epel-release -y
 
 echo "epel-release installed. Pausing for package update..."
 sudo yum update -y > /dev/null 2>&1
