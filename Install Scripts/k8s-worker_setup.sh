@@ -21,14 +21,9 @@ sudo sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 sudo swapoff -a
 sudo sed -i '/swap/d' /etc/fstab
 
-# Add firewall ports
-sudo firewall-cmd --permanent --add-port=6443/tcp
-sudo firewall-cmd --permanent --add-port=2379-2380/tcp
-sudo firewall-cmd --permanent --add-port=10250/tcp
-sudo firewall-cmd --permanent --add-port=10251/tcp
-sudo firewall-cmd --permanent --add-port=10259/tcp
-sudo firewall-cmd --permanent --add-port=10257/tcp
 sudo firewall-cmd --permanent --add-port=179/tcp
+sudo firewall-cmd --permanent --add-port=10250/tcp
+sudo firewall-cmd --permanent --add-port=30000-32767/tcp
 sudo firewall-cmd --permanent --add-port=4789/udp
 
 sudo firewall-cmd --reload
@@ -37,13 +32,7 @@ sudo firewall-cmd --reload
 sudo modprobe br_netfilter
 echo '1' | sudo tee /proc/sys/net/bridge/bridge-nf-call-iptables
 
-# Install Docker
-sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-sudo yum install containerd.io -y
-
-# Start and enable Docker
-sudo systemctl enable --now containerd.service
-
+# Add the following kernel parameters, create a file and with following content
 sudo cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-iptables  = 1
 net.ipv4.ip_forward                 = 1
@@ -51,6 +40,20 @@ net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 
 sudo sysctl --system
+
+# Install Docker
+sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install containerd.io -y
+sudo yum install docker-ce docker-ce-sli -y
+
+sudo systemctl enable --now docker.service
+
+containerd conﬁg default | sudo tee /etc/containerd/conﬁg.toml #>/dev/null 2>&1
+sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/conﬁg.toml
+
+# Start and enable Docker
+sudo systemctl enable containerd.service
+sudo systemctl restart containerd.service
 
 # Add Kubernetes repository
 sudo cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
@@ -68,24 +71,3 @@ sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
 
 # Enable and start kubelet
 sudo systemctl enable --now kubelet
-
-# Enable and start kubelet
-sudo systemctl enable --now kubelet
-
-# Set up kubeconfig for the root user
-echo "KUBECONFIG=/etc/kubernetes/admin.conf" >> ~/.bashrc
-source ~/.bashrc
-
-#sudo kubeadm init --pod-network-cidr=192.168.124.0/24
-sudo kubeadm init --control-plane-endpoint=k8s-master
-
-# Set up kubeconfig for a non-root user (uncomment and replace "yourusername" with your actual username)
-mkdir -p $HOME/.kube
-sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
-sudo chown $(id -u):$(id -g) $HOME/.kube/config
-
-# Install a Pod network add-on (Calico for this example)
-
-kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
-
-echo "Kubernetes master node setup is complete."
