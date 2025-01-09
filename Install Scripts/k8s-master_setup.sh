@@ -77,7 +77,9 @@ exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
 EOF
 
 # Install Kubernetes packages
-sudo yum install -y kubelet kubeadm kubectl
+#sudo yum install -y kubelet kubeadm kubectl
+sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+
 
 # Enable and start kubelet
 sudo systemctl enable --now kubelet

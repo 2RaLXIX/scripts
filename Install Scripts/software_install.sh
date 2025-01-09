@@ -24,7 +24,8 @@ echo "All specified packages installed successfully."
 
 # Use sed to uncomment the %wheel line in a safe way
 sudo cp /etc/sudoers /etc/sudoers.bak
-sudo sed -i 's/^#\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD: ALL\)/\1/' /etc/sudoers
+#sudo sed -i 's/^#\(%wheel\s\+ALL=(ALL)\s\+NOPASSWD: ALL\)/\1/' /etc/sudoers
+sudo bash -c echo "%wheel  ALL=(ALL)       NOPASSWD: ALL" >> /etc/sudoers
 
 read -p "Press any key to reboot"
 sudo reboot now
