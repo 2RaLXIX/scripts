@@ -4,7 +4,7 @@
 sudo yum update -y
 sudo yum install -y yum-utils device-mapper-persistent-data lvm2
 
-read -p "Enter IP and hostname for k8s master. It will be writen to /etc/hosts file. (Exaple: 192.168.124.69  k8s-master) " master
+read -p "Enter IP and hostname for k8s master (e.g., 192.168.124.69 k8s-master): " master
 sudo bash -c "echo $master >> /etc/hosts"
 
 read -p "Enter IP and hostname for k8s worker1: " worker1
@@ -28,81 +28,69 @@ sudo firewall-cmd --permanent --add-port=10250/tcp
 sudo firewall-cmd --permanent --add-port=10251/tcp
 sudo firewall-cmd --permanent --add-port=10259/tcp
 sudo firewall-cmd --permanent --add-port=10257/tcp
-sudo firewall-cmd --permanent --add-port=179/tcp
-sudo firewall-cmd --permanent --add-port=4789/udp
+# Uncomment only if needed for VXLAN
+# sudo firewall-cmd --permanent --add-port=4789/udp
 
 sudo firewall-cmd --reload
 
 # Enable br_netfilter module
-#sudo modprobe br_netfilter
-#echo '1' | sudo tee /proc/sys/net/bridge/bridge-nf-call-iptables
-
 sudo tee /etc/modules-load.d/containerd.conf <<EOF
 overlay
-br_netﬁlter
+br_netfilter
 EOF
 
 sudo modprobe overlay
-sudo modprobe br_netﬁlter
+sudo modprobe br_netfilter
 
-# Start and enable Docker
-sudo systemctl enable --now containerd.service
-
-sudo cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
-net.bridge.bridge-nf-call-iptables  = 1
-net.ipv4.ip_forward                 = 1
+# Apply sysctl params without reboot
+sudo tee /etc/sysctl.d/k8s.conf <<EOF
+net.bridge.bridge-nf-call-iptables = 1
+net.ipv4.ip_forward = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 EOF
 
 sudo sysctl --system
 
-# Install Docker
-sudo dnf config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
-sudo yum install containerd.io -y
-#sudo yum install docker-ce docker-ce-sli -y
+# Install containerd
+sudo dnf config-manager --add-repo=https://download.docker.com/linux/centos/docker-ce.repo
+sudo yum install -y containerd.io
 
-#sudo systemctl enable --now docker.service
+# Create default configuration file for containerd
+containerd config default | sudo tee /etc/containerd/config.toml >/dev/null 2>&1
 
-containerd conﬁg default | sudo tee /etc/containerd/conﬁg.toml >/dev/null 2>&1
+# Enable SystemdCgroup
+sudo sed -i 's/SystemdCgroup = false/SystemdCgroup = true/' /etc/containerd/config.toml
 
-sudo sed -i 's/SystemdCgroup \= false/SystemdCgroup \= true/g' /etc/containerd/conﬁg.toml
-
-# Start and enable Docker
+# Start and enable containerd
 sudo systemctl enable containerd.service
 sudo systemctl restart containerd.service
 
 # Add Kubernetes repository
-sudo cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+sudo tee /etc/yum.repos.d/kubernetes.repo <<EOF
 [kubernetes]
 name=Kubernetes
-baseurl=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/
+baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
 enabled=1
 gpgcheck=1
-gpgkey=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/repodata/repomd.xml.key
-exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
+gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg
 EOF
 
 # Install Kubernetes packages
-sudo yum install -y kubelet kubeadm kubectl --disableexcludes=kubernetes
+sudo yum install -y kubelet kubeadm kubectl
 
 # Enable and start kubelet
 sudo systemctl enable --now kubelet
 
-# Set up kubeconfig for the root user
-echo "KUBECONFIG=/etc/kubernetes/admin.conf" >> ~/.bashrc
-source ~/.bashrc
-
-#sudo kubeadm init --pod-network-cidr=192.168.124.0/24
+# Initialize Kubernetes
 sudo kubeadm init --control-plane-endpoint=k8s-master
 
-# Set up kubeconfig for a non-root user (uncomment and replace "yourusername" with your actual username)
+# Set up kubeconfig for the current user
 mkdir -p $HOME/.kube
 sudo cp /etc/kubernetes/admin.conf $HOME/.kube/config
 sudo chown $(id -u):$(id -g) $HOME/.kube/config
 
-# Install a Pod network add-on (Calico for this example)
-
-#kubectl apply -f https://docs.projectcalico.org/manifests/calico.yaml
+# Install a Pod network add-on (Calico in this example)
 kubectl apply -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.1/manifests/calico.yaml
 
 echo "Kubernetes master node setup is complete."
+
