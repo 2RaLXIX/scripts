@@ -64,7 +64,9 @@ sudo systemctl enable --now kubelet
 echo "KUBECONFIG=/etc/kubernetes/admin.conf" >> ~/.bashrc
 source ~/.bashrc
 
-sudo kubeadm init --pod-network-cidr=192.168.124.0/24
+#sudo kubeadm init --pod-network-cidr=192.168.124.0/24
+
+sudo kubeadm init --control-plane-endpoint=k8s-master
 
 # Set up kubeconfig for a non-root user (uncomment and replace "yourusername" with your actual username)
 mkdir -p $HOME/.kube
