@@ -1,0 +1,15 @@
+1. kubectl drain <node-name> --ignore-daemon-sets --delete-emptydir-data
+2. kubectl delete node <node-name>
+
+To connect it back or to existing kubernetes master
+1. sudo kubeadm reset -f (ON WORKER NODE)
+2. openssl x509 -pubkey -in /etc/kubernetes/pki/ca.crt | \
+openssl rsa -pubin -outform der 2>/dev/null | \
+openssl dgst -sha256 -hex | \
+sed 's/^.* //'
+3. kubeadm join <control-plane-endpoint>:<port> --token <token> --discovery-token-ca-cert-hash sha256:<hash>
+
+<control-plane-endpoint>:6443 ====> Hostname or IP of master server
+<hash>  ========  enter here unhashed openssl result
+
+4. kubectl label nodes k8s-worker2 node-role,kubernetes.io/worker=    ========== Add a label to role
