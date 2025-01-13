@@ -4,10 +4,11 @@ read -p "Press any key to continue"
 
 read -p "Enter hostname you want to give to this host: " name
 
-#sudo echo $name > /etc/hostname
-sudo bash -c "echo $name > /etc/hostname"
+#sudo bash -c "echo $name > /etc/hostname"
+sudo hostname set-hostname $name
 
 sudo usermod -aG wheel $(whoami)
+
 echo "Updating the repositories"
 sudo yum update -y
 
@@ -15,7 +16,8 @@ echo "installing epel-release..."
 sudo yum install epel-release -y
 
 echo "epel-release installed. Pausing for package update..."
-sudo yum update -y > /dev/null 2>&1
+#sudo yum update -y > /dev/null 2>&1
+sudo yum update -y
 
 echo "Installing programs..."
 sudo yum install vim net-tools tldr bat wget htop tree neofetch tar zip open-vm-tools bash-completion NetworkManager-initscripts-updown -y
