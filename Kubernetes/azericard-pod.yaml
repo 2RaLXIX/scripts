@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adapter-azericard-ufx-t
+  namespace: test
+  labels:
+    app: adapter-azericard-ufx
+    env: test
+  replicas: 1
+  selector:
+    matchLabels:
+      app: adapter-azericard-ufx
+      env: test
+  template:
+    metadata:
+      namespace: test
+      labels:
+        app: adapter-azericard-ufx
+        env: test
+    spec:
+      volumes:
+        - name: tz-config
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Baku
+            type: ''
+      containers:
+        - name: adapter-azericard-ufx
+          image: hub.goldenpay.az/private/ecomm-service-t:v73
+          ports:
+            - containerPort: 8080
+          env:
+            - name: PROFILE
+              value: test
+            - name: TZ
+              value: Asia/Baku
+          resources:
+            limits:
+              cpu: 512m
+              memory: 512Mi
+            requests:
+              cpu: 64m
+              memory: 64Mi
+          volumeMounts:
+            - name: tz-config
+              mountPath: /etc/localtime
+          livenessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 150
+            timeoutSeconds: 1
+            periodSeconds: 3
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /actuator/health
+              port: 8080
+              scheme: HTTP
+            initialDelaySeconds: 5
+            timeoutSeconds: 1
+            periodSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: adapter-azericard-ufx-service
+  namespace: test
+  labels:
+    app: adapter-azericard-ufx
+    env: test
+spec:
+  selector:
+    app: adapter-azericard-ufx
+    env: test
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: ClusterIP
