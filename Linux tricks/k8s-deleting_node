@@ -13,3 +13,4 @@ sed 's/^.* //'
 <hash>  ========  enter here unhashed openssl result
 
 4. kubectl label nodes k8s-worker2 node-role,kubernetes.io/worker=    ========== Add a label to role
+   kubectl label nodes k8s-worker1 node-role.kubernetes.io/worker=worker
