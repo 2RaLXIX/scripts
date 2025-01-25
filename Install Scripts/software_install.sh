@@ -36,7 +36,7 @@ if sudo grep -q '^#%wheel\s*ALL=(ALL)\s*NOPASSWD:\s*ALL' /etc/sudoers; then
     sudo sed -i 's/^#\(%wheel\s*ALL=(ALL)\s*NOPASSWD:\s*ALL\)/\1/' /etc/sudoers
 else
     # Append if the line doesn't exist
-    echo "%wheel  ALL=(ALL)       NOPASSWD: ALL" | sudo EDITOR='tee -a' visudo
+    echo "%wheel  ALL=(ALL)       NOPASSWD: ALL" > /dev/null 2>&1 | sudo EDITOR='tee -a' visudo
 fi
 
 read -p "Press any key to reboot"
