@@ -4,8 +4,8 @@ read -p "Press any key to continue"
 
 read -p "Enter hostname you want to give to this host: " name
 
-#sudo bash -c "echo $name > /etc/hostname"
-sudo hostname set-hostname ${name}
+sudo bash -c "echo $name > /etc/hostname"
+#sudo hostname set-hostname ${name}
 
 sudo usermod -aG wheel $(whoami)
 
