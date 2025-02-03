@@ -22,6 +22,10 @@ sudo yum update -y
 echo "Installing programs..."
 sudo yum install vim shellcheck net-tools tldr bat wget htop tree neofetch tar zip open-vm-tools bash-completion NetworkManager-initscripts-updown -y
 
+sudo dnf install -y dnf-utils
+sudo dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
+sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin -y
+
 echo "All specified packages installed successfully."
 
 # Use sed to uncomment the %wheel line in a safe way
