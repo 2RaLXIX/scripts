@@ -20,7 +20,8 @@ echo "epel-release installed. Pausing for package update..."
 sudo yum update -y
 
 echo "Installing programs..."
-sudo yum install vim shellcheck net-tools tldr bat wget htop tree neofetch tar zip open-vm-tools bash-completion NetworkManager-initscripts-updown -y
+sudo yum install vim shellcheck net-tools tldr bat wget htop tree neofetch \ 
+tar zip open-vm-tools bash-completion NetworkManager-initscripts-updown -y
 
 sudo dnf install -y dnf-utils
 sudo dnf config-manager --add-repo https://download.docker.com/linux/rhel/docker-ce.repo
