@@ -28,6 +28,7 @@ sudo firewall-cmd --permanent --add-port=10250/tcp
 sudo firewall-cmd --permanent --add-port=10251/tcp
 sudo firewall-cmd --permanent --add-port=10259/tcp
 sudo firewall-cmd --permanent --add-port=10257/tcp
+sudo firewall-cmd --permanent --add-port=179/tcp
 # Uncomment only if needed for VXLAN
 # sudo firewall-cmd --permanent --add-port=4789/udp
 
