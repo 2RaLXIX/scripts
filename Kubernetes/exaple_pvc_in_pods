@@ -1,0 +1,11 @@
+volumes:
+- name: data
+  persistentVolumeClaim:
+    claimName: local-pvc
+
+containers:
+- name: app
+  image: nginx
+  volumeMounts:
+  - mountPath: /usr/share/nginx/html
+    name: data
