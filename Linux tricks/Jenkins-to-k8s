@@ -1,0 +1,3 @@
+1. kubectl create serviceaccount admin -n default
+2. kubectl create clusterrolebinding admin-binding --clusterrole=cluster-admin --serviceaccount=default:admin
+3. kubectl create token admin --duration=3600h -n defaul
