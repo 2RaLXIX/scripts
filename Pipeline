@@ -1,0 +1,147 @@
+pipeline {
+  agent any
+
+  environment {
+    GIT_URL          = 'git@172.20.70.73:neo/test-app.git'
+    GIT_BRANCH       = 'master'
+    GIT_HOST         = '172.20.70.73'
+    GIT_CRED         = 'gitlab-ssh'
+
+    REGISTRY         = '172.20.70.71:8083/repository/docker-images'
+    IMAGE            = 'test-app'
+    DOCKER_CREDS     = 'nexus-docker'
+
+    K8S_NAMESPACE    = 'test-app'
+    KUBECONFIG_CRED  = 'kubeconfig'
+  }
+
+  stages {
+
+    stage('Prepare SSH known_hosts') {
+      steps {
+        sh '''
+          set -e
+          mkdir -p ~/.ssh
+          touch ~/.ssh/known_hosts
+          if ! grep -q "${GIT_HOST}" ~/.ssh/known_hosts; then
+            ssh-keyscan -t rsa,ecdsa,ed25519 ${GIT_HOST} >> ~/.ssh/known_hosts
+          fi
+        '''
+      }
+    }
+
+    stage('Checkout') {
+      steps {
+        sshagent(credentials: [env.GIT_CRED]) {
+          sh '''
+            set -e
+            if [ -d src/.git ]; then
+              cd src
+              git fetch --all
+              git checkout ${GIT_BRANCH}
+              git pull origin ${GIT_BRANCH}
+            else
+              git clone --branch ${GIT_BRANCH} ${GIT_URL} src
+            fi
+          '''
+        }
+      }
+    }
+
+    stage('Docker Build') {
+      steps {
+        dir('src') {
+          sh '''
+            set -e
+            docker version
+            docker build -t ${REGISTRY}/${IMAGE}:${BUILD_NUMBER} -t ${REGISTRY}/${IMAGE}:latest .
+          '''
+        }
+      }
+    }
+
+    stage('Push to Nexus') {
+      steps {
+        withCredentials([usernamePassword(credentialsId: env.DOCKER_CREDS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+          sh '''
+            set -e
+            echo "$DOCKER_PASS" | docker login ${REGISTRY} -u "$DOCKER_USER" --password-stdin
+            docker push ${REGISTRY}/${IMAGE}:${BUILD_NUMBER}
+            docker push ${REGISTRY}/${IMAGE}:latest
+            docker logout ${REGISTRY} || true
+          '''
+        }
+      }
+    }
+
+    stage('Deploy to Kubernetes') {
+      steps {
+        withCredentials([
+          file(credentialsId: env.KUBECONFIG_CRED, variable: 'KUBECONFIG_FILE'),
+          usernamePassword(credentialsId: env.DOCKER_CREDS, usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')
+        ]) {
+          sh '''
+            set -e
+            export KUBECONFIG="$KUBECONFIG_FILE"
+
+            kubectl get ns ${K8S_NAMESPACE} >/dev/null 2>&1 || kubectl create ns ${K8S_NAMESPACE}
+
+            if ! kubectl -n ${K8S_NAMESPACE} get secret nexus-reg-cred >/dev/null 2>&1; then
+              kubectl -n ${K8S_NAMESPACE} create secret docker-registry nexus-reg-cred \
+                --docker-server=${REGISTRY} \
+                --docker-username="$DOCKER_USER" \
+                --docker-password="$DOCKER_PASS"
+            fi
+
+            cat > k8s-deploy.yaml <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ${IMAGE}
+  namespace: ${K8S_NAMESPACE}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ${IMAGE}
+  template:
+    metadata:
+      labels:
+        app: ${IMAGE}
+    spec:
+      imagePullSecrets:
+      - name: nexus-reg-cred
+      containers:
+      - name: ${IMAGE}
+        image: ${REGISTRY}/${IMAGE}:${BUILD_NUMBER}
+        ports:
+        - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ${IMAGE}
+  namespace: ${K8S_NAMESPACE}
+spec:
+  selector:
+    app: ${IMAGE}
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+EOF
+
+            kubectl apply -f k8s-deploy.yaml
+            kubectl -n ${K8S_NAMESPACE} rollout status deploy/${IMAGE} --timeout=180s
+          '''
+        }
+      }
+    }
+  }
+
+  post {
+    always {
+      sh 'docker image prune -f || true'
+    }
+  }
+}
